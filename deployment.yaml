@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
       - name: my-flask-app
-        image: savitha1/my-flask-app:latest  # Use the actual tag
+        image: savitha1/my-flask-app:latest
+        imagePullPolicy: Always  # Ensure that the image is always pulled from the registry
         ports:
         - containerPort: 80
