@@ -47,15 +47,10 @@ jobs:
 
       - name: Create or update Azure Container App
         run: |
-          az containerapp create \
-            --name my-flask-app \
-            --resource-group myResourceGroup \
-            --image ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:latest \
-            --cpu 0.25 \
-            --memory 0.5 \
-            --target-port 5000 \
-            --environment myContainerAppEnv \
-            --ingress external \
-            --query properties.configuration.ingress.fqdn
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
 
- 
+      - name: Get Application URL
+        run: |
+          APP_URL=$(kubectl get svc my-flask-app-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          echo "Application URL: ${APP_URL}"
