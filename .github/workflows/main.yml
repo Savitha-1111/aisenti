@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: build-image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create or update Azure Container App
+        run: |
+          az containerapp create \
+            --name my-flask-app \
+            --resource-group myResourceGroup \
+            --image ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:latest \
+            --cpu 0.25 \
+            --memory 0.5 \
+            --target-port 5000 \
+            --environment myContainerAppEnv \
+            --ingress external \
+            --query properties.configuration.ingress.fqdn
+
+ 
