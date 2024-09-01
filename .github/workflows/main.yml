@@ -33,8 +33,10 @@ jobs:
       - name: Build and push Docker image
         id: build-image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:latest
+          IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:${IMAGE_TAG} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:${IMAGE_TAG}
+          echo "image-tag=${IMAGE_TAG}" >> $GITHUB_ENV
 
   deploy:
     runs-on: ubuntu-latest
