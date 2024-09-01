@@ -40,10 +40,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Login to Azure CLI
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: List files (for debugging)
+        run: ls -al
 
       - name: Create or update Azure Container App
         run: |
