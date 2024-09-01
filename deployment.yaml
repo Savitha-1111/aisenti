@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: my-flask-app
-        image: ${{ secrets.DOCKERHUB_USERNAME }}/my-flask-app:latest
+        image: savitha1/my-flask-app:latest
         ports:
         - containerPort: 80
