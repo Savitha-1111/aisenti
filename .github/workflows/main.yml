@@ -1,4 +1,4 @@
-name: CI/CD Pipeline1
+name: CI/CD Pipeline
 
 on:
   push:
@@ -48,10 +48,14 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: List files (for debugging)
-        run: ls -al
+      - name: Set up Kubernetes context
+        run: |
+          az aks get-credentials --resource-group myResourceGroup --name myAKSCluster
 
-      - name: Create or update Azure Container App
+      - name: Check kubectl version
+        run: kubectl version --client
+
+      - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
