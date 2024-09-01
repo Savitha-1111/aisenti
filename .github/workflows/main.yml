@@ -60,9 +60,6 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
 
-      - name: Force rollout restart
-        run: kubectl rollout restart deployment/my-flask-app
-
       - name: Get Application URL
         run: |
           APP_URL=$(kubectl get svc my-flask-app-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
